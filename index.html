@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="utf-8" />
+  <title>Soma Daily</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    .item { margin-bottom: 8px; }
+    #score { font-size: 24px; color: darkblue; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h2>Soma Daily 記錄</h2>
+  <p>UID：<span id="uidSpan">尚未登入</span></p>
+
+  <!-- 登入表單 -->
+  <form id="loginForm" onsubmit="login(event)">
+    Email：<input id="emailInput" type="email" placeholder="Email" required><br><br>
+    密碼：<input id="pwInput" type="password" placeholder="Password" required><br><br>
+    <button type="submit">登入</button>
+  </form>
+
+  <!-- 使用者登入後顯示內容 -->
+  <div id="mainContent" style="display: none;">
+    <h3>📅 今日行程安排</h3>
+    <table id="scheduleTable">
+      <tr><th>時間</th><th>活動</th></tr>
+    </table>
+
+    <h3>🎯 每日挑戰任務</h3>
+    <form id="taskForm">
+      <div class="item"><input type="checkbox" name="task" value="吃早餐"> 吃早餐</div>
+      <div class="item"><input type="checkbox" name="task" value="喝水"> 喝水</div>
+      <div class="item"><input type="checkbox" name="task" value="曬太陽"> 曬太陽</div>
+      <div class="item"><input type="checkbox" name="task" value="量體重"> 量體重</div>
+      <div class="item"><input type="checkbox" name="task" value="運動"> 運動</div>
+      <div class="item"><input type="checkbox" name="task" value="洗澡"> 洗澡</div>
+      <div class="item"><input type="checkbox" name="task" value="刷牙"> 刷牙</div>
+      <div class="item"><input type="checkbox" name="task" value="冥想"> 冥想</div>
+      <div class="item"><input type="checkbox" name="task" value="閱讀"> 閱讀</div>
+      <div class="item"><input type="checkbox" name="task" value="服藥"> 服藥</div>
+      <div class="item"><input type="checkbox" name="task" value="寫日記"> 寫日記</div>
+      <div class="item"><input type="checkbox" name="task" value="打掃"> 打掃</div>
+      <div class="item"><input type="checkbox" name="task" value="與人互動"> 與人互動</div>
+      <button type="button" onclick="calculateScore()">計算分數</button>
+    </form>
+
+    <div id="score">今日得分：0.0</div>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+
+  <script>
+    // 行程表時間自動生成
+    window.addEventListener("DOMContentLoaded", () => {
+      const scheduleTable = document.getElementById("scheduleTable");
+      for (let hour = 6; hour <= 22; hour++) {
+        const row = document.createElement("tr");
+        const timeCell = document.createElement("td");
+        const activityCell = document.createElement("td");
+        timeCell.textContent = `${hour}:00`;
+        activityCell.innerHTML = `<input type="text" name="schedule-${hour}" placeholder="填寫活動">`;
+        row.appendChild(timeCell);
+        row.appendChild(activityCell);
+        scheduleTable.appendChild(row);
+      }
+    });
+
+    // 模擬登入（這邊你可以替換成 Firebase 的登入驗證）
+    function login(event) {
+      event.preventDefault();
+      const email = document.getElementById("emailInput").value;
+      const pw = document.getElementById("pwInput").value;
+      // 模擬登入成功
+      document.getElementById("uidSpan").textContent = email;
+      document.getElementById("loginForm").style.display = "none";
+      document.getElementById("mainContent").style.display = "block";
+    }
+
+    // 分數計算
+    function calculateScore() {
+      const form = document.getElementById("taskForm");
+      const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+      let score = 0.0;
+
+      const minusTasks = ["服藥", "寫日記", "與人互動"];
+
+      checkboxes.forEach((checkbox) => {
+        if (checkbox.checked) {
+          score += 0.1;
+        }
+      });
+
+      minusTasks.forEach((task) => {
+        const checkbox = Array.from(checkboxes).find(cb => cb.value === task);
+        if (!checkbox.checked) {
+          score -= 0.1;
+        }
+      });
+
+      score = Math.max(0, parseFloat(score.toFixed(1)));
+      document.getElementById("score").textContent = `今日得分：${score}`;
+    }
+  </script>
+</body>
+</html>
